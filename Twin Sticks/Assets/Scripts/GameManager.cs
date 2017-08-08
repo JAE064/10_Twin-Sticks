@@ -6,18 +6,30 @@ using UnityStandardAssets.CrossPlatformInput;
 public class GameManager : MonoBehaviour
 {
     public bool recording;
+
+    private float initialFixedDelta;
+    private bool isPaused;
 	
     void Start()
     {
         PlayerPrefsManager.UnlockLevel(2);
-        print(PlayerPrefsManager.IsLevelUnlocked(1));
-        print(PlayerPrefsManager.IsLevelUnlocked(2));
+        isPaused = false;
+        initialFixedDelta = Time.fixedDeltaTime;
     }
 
 	// Update is called once per frame
 	void Update ()
     {
-		if(CrossPlatformInputManager.GetButton("Fire1"))
+        recordGame();
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            PauseGame();
+        }
+    }
+
+    private void recordGame()
+    {
+        if (CrossPlatformInputManager.GetButton("Fire1"))
         {
             recording = false;
         }
@@ -25,5 +37,27 @@ public class GameManager : MonoBehaviour
         {
             recording = true;
         }
-	}
+    }
+
+    void PauseGame()
+    {
+        if (isPaused)
+        {
+            Time.timeScale = 1f;
+            Time.fixedDeltaTime = initialFixedDelta;
+            isPaused = false;
+        }
+        else
+        {
+            Time.timeScale = 0;
+            Time.fixedDeltaTime = 0;
+            isPaused = true;
+        }
+        
+    }
+
+    void OnApplicationPause(bool pauseStatus)
+    {
+        isPaused = pauseStatus;
+    }
 }
